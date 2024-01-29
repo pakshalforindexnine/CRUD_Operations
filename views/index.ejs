@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CRUD Operations</title>
+  <!-- Add any necessary CSS or JavaScript libraries, including the Fetch API polyfill if needed -->
+</head>
+<body>
+
+  <h1 class="mt-5">CRUD Operations</h1>
+  <table class="table mt-3">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Name</th>
+        <th scope="col">Email</th>
+        <th scope="col">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% users.forEach(user => { %>
+        <tr>
+          <th scope="row"><%= user.id %></th>
+          <td><%= user.name %></td>
+          <td><%= user.email %></td>
+          <td>
+            <a href="/users/new">Create New User</a>
+            <a href="/users/<%= user.id %>" class="btn btn-info btn-sm">View</a>
+            <a href="/users/<%= user.id %>/edit" class="btn btn-warning btn-sm">Edit</a>
+            <a href="/users/<%= user.id %>" class="btn btn-danger btn-sm" data-method="DELETE" data-confirm="Are you sure?">Delete</a>
+          </td>
+        </tr>
+      <% }); %>
+    </tbody>
+  </table>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const deleteButtons = document.querySelectorAll('.btn-danger');
+
+      deleteButtons.forEach(button => {
+        button.addEventListener('click', (event) => {
+          event.preventDefault();
+
+          const confirmation = confirm("Are you sure?");
+          
+          if (confirmation) {
+            const userId = button.getAttribute('href').split('/').pop();
+
+            fetch(`/users/${userId}`, {
+              method: 'DELETE',
+            })
+            .then(response => {
+              if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+              }
+              const row = button.closest('tr');
+              row.parentNode.removeChild(row);
+            })
+            .catch(error => {
+              console.error('Error:', error);
+            });
+          }
+        });
+      });
+    });
+  </script>
+
+</body>
+</html>
